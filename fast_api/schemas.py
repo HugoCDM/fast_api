@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from fast_api.models import TodoState
@@ -34,6 +36,18 @@ class FilterPage(BaseModel):
     limit: int = Field(ge=0, default=10)
 
 
+class FilterTodo(FilterPage):
+    title: str | None = Field(default=None, min_length=3)
+    description: str | None = None
+    state: TodoState | None = None
+
+
+class TodoUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    state: TodoState | None = None
+
+
 class TodoSchema(BaseModel):
     title: str
     description: str
@@ -42,12 +56,9 @@ class TodoSchema(BaseModel):
 
 class TodoPublic(TodoSchema):
     id: int
-
-
-class FilterTodo(FilterPage):
-    title: str | None = Field(default=None, min_length=3)
-    description: str | None = None
-    state: TodoState | None = None
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TodoList(BaseModel):
